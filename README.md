@@ -1,4 +1,4 @@
-<img src="assets/hero.svg" width="100%" alt="Emre Yıldırım — turning ideas into real products. Big Data Analytics at SUBÜ; data tools, apps and games.">
+<img src="assets/hero.svg" width="100%" alt="esphi — turning ideas into real products. Big Data Analytics at SUBÜ; data tools, apps and games.">
 
 I study **Big Data Analytics** at Sakarya University of Applied Sciences (SUBÜ) and build software end to end: data tools, mobile apps, games.<br>Veri analizi okuyorum; en çok sevdiğim şey bir fikri alıp gerçekten çalışan bir ürüne çevirmek. Kodlarım şimdilik gizli, o yüzden her projenin nerede durduğunu aşağıda olduğu gibi gösterdim.
 

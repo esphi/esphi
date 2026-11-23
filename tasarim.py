@@ -185,13 +185,13 @@ def hero():
     px, py = W - pw - 20, (H - ph) / 2
     govde, css = portre(px, py, sut, sat, pf, lh)
 
-    x, ust = 52, 74
-    ad1, w1, h1 = rakamli_ad("EMRE", x, ust, 17, 4.2, TURUNCU, 1)
-    ad2, w2, h2 = rakamli_ad("YILDIRIM", x, ust + h1 + 8, 17, 4.2, YAZI, 2)
-    alt = ust + h1 + 8 + h2
+    x, ust = 52, 96
+    ad1, w1, h1 = rakamli_ad("ESPHI", x, ust, 22, 4.2, TURUNCU, 1)
+    ad2 = ""
+    alt = ust + h1
 
     p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
-         f'role="img" aria-label="Emre Yıldırım — turning ideas into real products. Big Data Analytics, SUBÜ.">']
+         f'role="img" aria-label="esphi — turning ideas into real products. Big Data Analytics, SUBÜ.">']
     p.append(f"""<style>{css}
 .coz{{opacity:0;animation:an .11s steps(1) 1}}
 .otur{{animation:kal .01s linear backwards}}
