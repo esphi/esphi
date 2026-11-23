@@ -266,13 +266,26 @@ def pipeline():
 # ================================================================ imza
 
 def imza():
-    W, H = 900, 64
-    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="esphi">'
-            f'<style>.i{{animation:y 1.1s steps(1) infinite}}@keyframes y{{50%{{opacity:0}}}}{AZ_HAREKET}</style>'
-            f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="12" fill="{ZEMIN}" stroke="{KENAR}"/>'
-            f'<text x="28" y="38" font-family="{MONO}" font-size="14" fill="{SOLUK}" xml:space="preserve">'
-            f'<tspan fill="{TURUNCU}">esphi</tspan>@github:~$ echo "next: ship KESEN"'
-            f'<tspan class="i" fill="{TURUNCU}"> █</tspan></text></svg>')
+    """Sayfa sonu: kısa bir terminal oturumu (stack + sıradaki iş). Satırlar sırayla basılır;
+    hareket oynamasa da hepsi görünür kalır."""
+    W, H = 900, 128
+    stack = "python  sql  javascript  typescript  dart  next.js  react  flutter  supabase  godot  unity  git"
+    istem = f'<tspan fill="{TURUNCU}">esphi</tspan>@github:~$ '
+    satirlar = [
+        (istem + "ls stack/", SOLUK),
+        (e(stack), YAZI),
+        (istem + 'echo "next: ship KESEN"' + f'<tspan class="i" fill="{TURUNCU}"> █</tspan>', SOLUK),
+    ]
+    p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" '
+         f'aria-label="Stack: {stack}. Next: ship KESEN.">',
+         f'<style>.s{{animation:bas .01s linear backwards}}@keyframes bas{{from{{opacity:0}}to{{opacity:0}}}}'
+         f'.i{{animation:y 1.1s steps(1) infinite}}@keyframes y{{50%{{opacity:0}}}}{AZ_HAREKET}</style>',
+         f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="12" fill="{ZEMIN}" stroke="{KENAR}"/>']
+    for i, (metin, renk) in enumerate(satirlar):
+        p.append(f'<text class="s" style="animation-delay:{0.4 + i * 0.5:.1f}s" x="28" y="{40 + i * 30}" '
+                 f'font-family="{MONO}" font-size="14" fill="{renk}" xml:space="preserve">{metin}</text>')
+    p.append("</svg>")
+    return "\n".join(p)
 
 
 if __name__ == "__main__":
