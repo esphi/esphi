@@ -1,8 +1,8 @@
 """Profil README görsellerini üretir (assets/ altına SVG). Çalıştır: python3 tasarim.py
 
   hero.svg               — kapak: başlık + hareketli ASCII portre (profil fotoğrafından)
-  bolum-<no>-<tema>.svg  — bölüm başlıkları, açık/koyu tema
-  proje-<ad>.svg         — öne çıkan proje kartları (her temada koyu)
+  bolum-<ad>-<tema>.svg  — bölüm başlıkları, açık/koyu tema
+  proje-<ad>.svg         — öne çıkan proje kartları (her temada koyu; KESEN büyük)
 
 Renkler: lacivert-siyah zemin, sıcak turuncu vurgu #F47735, yumuşak beyaz yazı.
 """
@@ -124,48 +124,36 @@ def portre(x0, y0, sutun, satir, pf, lh, kare_sayisi=6, dongu=4.8):
 # ================================================================ kapak
 
 def hero():
-    W, H = 960, 440
-    # portre: 84×42 karakter, 7.4px → ~373×373
-    sut, sat, pf = 84, 42, 7.4
+    W, H = 960, 420
+    # portre: 86×44 karakter, 7.6px → ~392×401
+    sut, sat, pf = 86, 44, 7.6
     lh = pf * 1.2
     pw, ph = sut * pf * 0.6, sat * lh
-    px, py = W - pw - 28, (H - ph) / 2
+    px, py = W - pw - 16, (H - ph) / 2
     govde, css = portre(px, py, sut, sat, pf, lh)
 
     p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
-         f'role="img" aria-label="Emre Yıldırım — Turning ideas into real products.">']
+         f'role="img" aria-label="Emre Yıldırım — Turning ideas into real products. Big Data Analytics student at SUBÜ.">']
     p.append(f"<style>{css}{AZ_HAREKET}</style>")
     p.append(f"""<defs>
 <clipPath id="c"><rect width="{W}" height="{H}" rx="18"/></clipPath>
-<linearGradient id="solgecis" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".28" stop-color="#fff"/></linearGradient>
-<linearGradient id="altgecis" x1="0" x2="0" y1="0" y2="1"><stop offset=".72" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<linearGradient id="solgecis" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".16" stop-color="#fff"/></linearGradient>
+<linearGradient id="altgecis" x1="0" x2="0" y1="0" y2="1"><stop offset=".86" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
 <mask id="m1"><rect x="{px}" y="0" width="{pw}" height="{H}" fill="url(#solgecis)"/></mask>
 <mask id="m2"><rect x="0" y="{py}" width="{W}" height="{ph}" fill="url(#altgecis)"/></mask>
 <radialGradient id="isilti" cx=".78" cy=".45" r=".55"><stop offset="0" stop-color="{TURUNCU}" stop-opacity=".10"/><stop offset="1" stop-color="{TURUNCU}" stop-opacity="0"/></radialGradient>
 </defs>""")
     p.append(f'<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{ZEMIN}"/>')
     p.append(f'<rect width="{W}" height="{H}" fill="url(#isilti)"/>')
-    # ince teknik ızgara noktaları
-    for gx in range(56, 520, 24):
-        for gy in range(40, H - 30, 24):
-            p.append(f'<circle cx="{gx}" cy="{gy}" r=".7" fill="{CIZGI}" opacity=".55"/>')
     p.append(f'<g mask="url(#m1)"><g mask="url(#m2)">{govde}</g></g>')
 
-    x = 56
-    p.append(f'<rect x="{x}" y="58" width="8" height="8" fill="{TURUNCU}"/>')
-    p.append(f'<text x="{x + 18}" y="66" font-family="{MONO}" font-size="12.5" letter-spacing="2.2" fill="{SOLUK}">EMRE YILDIRIM  /  ESPHI</text>')
-    p.append(f'<text font-family="{SERIF}" font-size="58" fill="{YAZI}" letter-spacing="-1">'
-             f'<tspan x="{x - 3}" y="168">Turning ideas</tspan>'
-             f'<tspan x="{x - 3}" y="234">into <tspan fill="{TURUNCU}" font-style="italic">real products</tspan>.</tspan></text>')
-    p.append(f'<text font-family="{SANS}" font-size="17" fill="{SOLUK}">'
-             f'<tspan x="{x}" y="290">Data analytics, software and AI-powered tools —</tspan>'
-             f'<tspan x="{x}" y="315">taken from a first idea to a working product.</tspan></text>')
-    p.append(f'<line x1="{x}" y1="356" x2="{x + 430}" y2="356" stroke="{CIZGI}"/>')
-    alt = [("BIG DATA ANALYTICS", 0), ("SUBÜ", 182), ("TÜRKİYE", 250)]
-    for metin, dx in alt:
-        p.append(f'<text x="{x + dx}" y="384" font-family="{MONO}" font-size="11.5" letter-spacing="1.8" fill="{SOLUK}">{e(metin)}</text>')
-    for dx in (168, 236):
-        p.append(f'<line x1="{x + dx}" y1="373" x2="{x + dx}" y2="388" stroke="{CIZGI}"/>')
+    x = 60
+    p.append(f'<text x="{x - 3}" y="178" font-family="{SERIF}" font-size="68" letter-spacing="-1.5" fill="{YAZI}">Emre Yıldırım</text>')
+    p.append(f'<text x="{x}" y="236" font-family="{SANS}" font-size="29" letter-spacing="-.3" fill="{YAZI}">'
+             f'Turning ideas into <tspan fill="{TURUNCU}">real products.</tspan></text>')
+    p.append(f'<rect x="{x}" y="268" width="44" height="3" fill="{TURUNCU}"/>')
+    p.append(f'<text x="{x}" y="310" font-family="{SANS}" font-size="19" fill="{SOLUK}">Big Data Analytics student at SUBÜ.</text>')
+    p.append(f'<text x="{x}" y="338" font-family="{SANS}" font-size="19" fill="{SOLUK}">Data tools, mobile apps and games.</text>')
     p.append(f'</g><rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="18" fill="none" stroke="{KENAR}"/>')
     p.append("</svg>")
     return "\n".join(p)
@@ -173,22 +161,16 @@ def hero():
 
 # ================================================================ bölüm başlıkları
 
-def bolum(no, baslik, not_=""):
-    W, H = 640, 64
+def bolum(baslik):
+    W, H = 900, 60
     out = {}
-    for tema, (yazi, soluk, cizgi, tur) in {
-        "koyu": (YAZI, SOLUK, "#30363D", TURUNCU),
-        "acik": ("#1F2328", "#59636E", "#D1D9E0", "#D9601F"),
-    }.items():
-        genis = 22 + len(baslik) * 15.5
-        p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{e(baslik)}">',
-             f'<text x="0" y="40" font-family="{MONO}" font-size="13" letter-spacing="1.5" fill="{tur}">{no}</text>',
-             f'<text x="34" y="42" font-family="{SERIF}" font-size="30" letter-spacing="-.4" fill="{yazi}">{e(baslik)}</text>',
-             f'<line x1="{34 + genis}" y1="36" x2="{W - (len(not_) * 8 + 16 if not_ else 0)}" y2="36" stroke="{cizgi}"/>']
-        if not_:
-            p.append(f'<text x="{W}" y="40" text-anchor="end" font-family="{MONO}" font-size="11.5" letter-spacing="1.5" fill="{soluk}">{e(not_)}</text>')
-        p.append("</svg>")
-        out[tema] = "\n".join(p)
+    for tema, (yazi, cizgi) in {"koyu": (YAZI, "#30363D"), "acik": ("#1F2328", "#D1D9E0")}.items():
+        genis = len(baslik) * 15.5 + 22
+        out[tema] = "\n".join([
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{e(baslik)}">',
+            f'<text x="0" y="40" font-family="{SERIF}" font-size="31" letter-spacing="-.4" fill="{yazi}">{e(baslik)}</text>',
+            f'<line x1="{genis}" y1="34" x2="{W}" y2="34" stroke="{cizgi}"/>',
+            "</svg>"])
     return out
 
 
@@ -296,37 +278,26 @@ def m_biiip(cx, cy):
 
 
 PROJELER = [
-    # dosya, no, ad, kategori, tek satır, durum, motif
-    ("kesen", "01", "KESEN", "DAILY NUMBER PUZZLE · iOS / ANDROID",
-     "Every row, column and diagonal has a target sum.", "iOS IN APP STORE REVIEW · ANDROID IN CLOSED TESTING", m_kesen),
-    ("pass", "02", "Pass", "RESTAURANT OPERATIONS",
-     "Waiter orders, kitchen display, cashier and QR menu.", "PRODUCT BUILT · NOT YET ON SALE", m_pass),
-    ("veripilot", "03", "VeriPilot", "EXCEL → DASHBOARD",
-     "Upload a spreadsheet, get an automated dashboard.", "WORKING PROJECT", m_veripilot),
-    ("veri-temizleyici", "04", "Veri Temizleyici", "DATA QUALITY",
-     "Duplicates, outliers and inconsistent spellings.", "LOCAL VERSION COMPLETE", m_temizleyici),
-    ("odanda-gor", "05", "Odanda Gör", "AUGMENTED REALITY · FURNITURE",
-     "See furniture in your own room at real-world size.", "EARLY DEVELOPMENT · DEMO READY", m_odanda),
-    ("biiip", "06", "BİİİP", "TURKISH RAP LYRIC GAME",
-     "Hear the track, complete the missing bar.", "EXPERIMENTAL · IN DEVELOPMENT", m_biiip),
+    # dosya, ad, kategori, motif, büyük mü
+    ("kesen", "KESEN", "Daily number puzzle · iOS & Android", m_kesen, True),
+    ("pass", "Pass", "Restaurant operations", m_pass, False),
+    ("veripilot", "VeriPilot", "Excel → dashboard", m_veripilot, False),
+    ("veri-temizleyici", "Veri Temizleyici", "Data quality", m_temizleyici, False),
+    ("odanda-gor", "Odanda Gör", "Augmented reality · furniture", m_odanda, False),
+    ("biiip", "BİİİP", "Turkish rap lyric game", m_biiip, False),
 ]
 
 
-def proje(no, ad, kategori, satir, durum, motif):
-    W, H = 900, 176
-    p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{e(ad)} — {e(satir)}">',
-         f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="14" fill="{KART}" stroke="{KENAR}"/>',
-         f'<rect x="0" y="22" width="3" height="40" fill="{TURUNCU}"/>',
-         f'<text x="36" y="47" font-family="{MONO}" font-size="12.5" letter-spacing="1.6" fill="{TURUNCU}">{no}</text>',
-         f'<text x="68" y="47" font-family="{MONO}" font-size="11.5" letter-spacing="1.8" fill="{SOLUK}">{e(kategori)}</text>',
-         f'<text x="34" y="100" font-family="{SERIF}" font-size="46" letter-spacing="-.8" fill="{YAZI}">{e(ad)}</text>',
-         f'<text x="36" y="130" font-family="{SANS}" font-size="16" fill="{SOLUK}">{e(satir)}</text>']
-    # durum
-    p.append(f'<circle cx="40" cy="152" r="3.2" fill="{TURUNCU}"/>')
-    p.append(f'<text x="51" y="156" font-family="{MONO}" font-size="10.5" letter-spacing="1.4" fill="{YAZI}" opacity=".82">{e(durum)}</text>')
-    # motif alanı
-    p.append(f'<line x1="{W - 230}" y1="26" x2="{W - 230}" y2="{H - 26}" stroke="{KENAR}"/>')
-    p.append(motif(W - 115, H / 2))
+def proje(ad, kategori, motif, buyuk):
+    W, H = 900, 210 if buyuk else 132
+    olcek = 1.45 if buyuk else 0.8
+    ad_boy, ad_y = (64, 128) if buyuk else (44, 84)
+    p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{e(ad)} — {e(kategori)}">',
+         f'<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="14" fill="{KART}" stroke="{TURUNCU if buyuk else KENAR}" stroke-opacity="{.55 if buyuk else 1}"/>',
+         f'<text x="38" y="{ad_y}" font-family="{SERIF}" font-size="{ad_boy}" letter-spacing="-1" fill="{YAZI}">{e(ad)}</text>',
+         f'<text x="40" y="{ad_y + (44 if buyuk else 30)}" font-family="{SANS}" font-size="{19 if buyuk else 16}" fill="{SOLUK}">{e(kategori)}</text>']
+    mx = W - (170 if buyuk else 120)
+    p.append(f'<g transform="translate({mx} {H / 2}) scale({olcek}) translate({-mx} {-H / 2})">{motif(mx, H / 2)}</g>')
     p.append("</svg>")
     return "\n".join(p)
 
@@ -341,21 +312,17 @@ def ayrac():
             f'<line x1="{W/2 + 40}" y1="20" x2="{W}" y2="20" stroke="{CIZGI}"/></svg>')
 
 
-BOLUMLER = [
-    ("01", "About", ""),
-    ("02", "Featured Work", "6 PROJECTS"),
-    ("03", "Other Experiments", ""),
-    ("04", "Tech Stack", ""),
-    ("05", "Current Focus", ""),
-    ("06", "Contact", ""),
-]
+BOLUMLER = [("about", "About"), ("work", "Featured Work"), ("experiments", "Other Experiments"),
+            ("stack", "Tech Stack"), ("now", "Current Focus")]
 
 if __name__ == "__main__":
+    for eski in VARLIK.glob("*.svg"):
+        eski.unlink()  # hepsi bu betikten üretiliyor
     (VARLIK / "hero.svg").write_text(hero(), encoding="utf-8")
-    for no, baslik, not_ in BOLUMLER:
-        for tema, icerik in bolum(no, baslik, not_).items():
-            (VARLIK / f"bolum-{no}-{tema}.svg").write_text(icerik, encoding="utf-8")
-    for dosya, no, ad, kat, satir, durum, motif in PROJELER:
-        (VARLIK / f"proje-{dosya}.svg").write_text(proje(no, ad, kat, satir, durum, motif), encoding="utf-8")
+    for dosya, baslik in BOLUMLER:
+        for tema, icerik in bolum(baslik).items():
+            (VARLIK / f"bolum-{dosya}-{tema}.svg").write_text(icerik, encoding="utf-8")
+    for dosya, ad, kat, motif, buyuk in PROJELER:
+        (VARLIK / f"proje-{dosya}.svg").write_text(proje(ad, kat, motif, buyuk), encoding="utf-8")
     (VARLIK / "ayrac.svg").write_text(ayrac(), encoding="utf-8")
     print("tamam:", sorted(f.name for f in VARLIK.glob("*.svg")))
