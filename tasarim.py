@@ -1,6 +1,6 @@
 """Profil README görsellerini üretir (assets/ altına SVG). Çalıştır: python3 tasarim.py
 
-  hero.svg      — kapak: rakamlardan oluşan ad (açılışta çözülür) + hareketli ASCII portre
+  hero.svg      — kapak: tam genişlik hareketli ASCII tablo (profil fotoğrafından) + slogan
   pipeline.svg  — 11 projenin gerçek aşaması: Idea → Prototype → Working → Built → Review → Live
   imza.svg      — sayfa sonu: terminal imzası
 
@@ -11,9 +11,7 @@ import math
 from html import escape
 from pathlib import Path
 
-import random
-
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
 
 KOK = Path(__file__).parent
 VARLIK = KOK / "assets"
@@ -50,9 +48,9 @@ def _boya(rgb, v):
     return f"#{r:02x}{g:02x}{b:02x}"
 
 
-def izgara(sutun, satir):
+def izgara(sutun, satir, kaynak=None):
     """Her hücre: (parlaklık, renk, tür) — tür 'z' zemin, 'f' figür, 'k' güvercin."""
-    renkli = Image.open(FOTO).convert("RGB").resize((sutun, satir), Image.LANCZOS)
+    renkli = (kaynak or Image.open(FOTO).convert("RGB")).resize((sutun, satir), Image.LANCZOS)
     gri = ImageEnhance.Contrast(ImageOps.autocontrast(renkli.convert("L"), cutoff=2)).enhance(1.3)
     zemin, kus = Image.new("L", renkli.size), Image.new("L", renkli.size)
     for y in range(satir):
@@ -60,7 +58,7 @@ def izgara(sutun, satir):
             r, g, b = renkli.getpixel((x, y))
             if (b - r) > 9 and (r + g + b) / 3 < 120:
                 zemin.putpixel((x, y), 255)
-            if gri.getpixel((x, y)) > 150 and y < satir * 0.5:
+            if gri.getpixel((x, y)) > 150 and y < satir * 0.5 and x > sutun * 0.55:
                 kus.putpixel((x, y), 255)
     zemin = zemin.filter(ImageFilter.MedianFilter(3))
     kus = kus.filter(ImageFilter.MedianFilter(3)).filter(ImageFilter.MaxFilter(3))
@@ -105,8 +103,8 @@ def _yaz(satirlar, x0, y0, lh):
     return out
 
 
-def portre(x0, y0, sutun, satir, pf, lh, kare_sayisi=6, dongu=4.8):
-    g = izgara(sutun, satir)
+def portre(x0, y0, sutun, satir, pf, lh, kare_sayisi=6, dongu=4.8, kaynak=None):
+    g = izgara(sutun, satir, kaynak)
     p = [f'<g font-family="{MONO}" font-size="{pf}px">']
     for k in range(kare_sayisi):
         p.append(f'<g class="kare kare{k}" style="animation-delay:{-k * dongu / kare_sayisi:.2f}s">')
@@ -123,97 +121,68 @@ def portre(x0, y0, sutun, satir, pf, lh, kare_sayisi=6, dongu=4.8):
     return "\n".join(p), css
 
 
-# ================================================================ rakamlardan ad
+# ================================================================ kapak (tam ASCII)
 
-AD_FONT = "/System/Library/Fonts/Supplemental/DIN Condensed Bold.ttf"
+def genis_tablo(W, H):
+    """Kare portreyi geniş bir tabloya çevirir: sağda fotoğraf, solda tablonun kendi
+    lacivert tonlarından üretilmiş yumuşak, boyalı bir arka plan."""
+    import random
+    foto = Image.open(FOTO).convert("RGB").resize((H, H), Image.LANCZOS)
+    # fotoğrafın arka plan tonları (lacivert hücreler)
+    kucuk = foto.resize((60, 60))
+    tonlar = [kucuk.getpixel((i % 60, i // 60)) for i in range(3600)]
+    tonlar = [c for c in tonlar if c[2] - c[0] > 9 and sum(c) / 3 < 120]
+    ort = tuple(sum(c[i] for c in tonlar) // len(tonlar) for i in range(3))
+    # düşük frekanslı gürültü: fırça darbesi gibi aydınlık-karanlık lekeler
+    rnd = random.Random(7)
+    gurultu = Image.new("L", (14, 6))
+    gurultu.putdata([rnd.randint(0, 255) for _ in range(14 * 6)])
+    gurultu = gurultu.resize((W, H), Image.BICUBIC).filter(ImageFilter.GaussianBlur(H / 12))
+    tuval = Image.new("RGB", (W, H))
+    px = tuval.load()
+    g = gurultu.load()
+    for y in range(H):
+        for x in range(W):
+            k = 0.50 + 0.60 * g[x, y] / 255 - 0.20 * y / H
+            px[x, y] = tuple(max(0, min(255, int(c * k))) for c in ort)
+    maske = Image.new("L", (W, H), 0)
+    d = ImageDraw.Draw(maske)
+    for i in range(90):
+        d.line([(W - H + i, 0), (W - H + i, H)], fill=int(255 * i / 90))
+    d.rectangle([W - H + 90, 0, W, H], fill=255)
+    tam = tuval.copy()
+    tam.paste(foto, (W - H, 0))
+    return Image.composite(tam, tuval, maske)
 
-
-def rakam_bitmap(metin, satir):
-    """Metni kalın yazı tipiyle çizip satır×sütun hücre ızgarasına indirir (hücre 1:2 oranlı)."""
-    f = ImageFont.truetype(AD_FONT, 400)
-    aralik = 34  # harf arası boşluk: rakam dokusunda harfler birbirine yapışmasın
-    genis = sum(f.getbbox(h)[2] for h in metin) + aralik * (len(metin) - 1)
-    _, y0, _, y1 = f.getbbox(metin)
-    img = Image.new("L", (genis + 4, y1 - y0 + 4), 0)
-    d, x = ImageDraw.Draw(img), 2
-    for h in metin:
-        d.text((x, 2 - y0), h, font=f, fill=255)
-        x += f.getbbox(h)[2] + aralik
-    w, h = img.size
-    sutun = round(w / h * satir * 2)   # hücre yüksekliği genişliğinin 2 katı
-    return img.resize((sutun, satir), Image.BOX)
-
-
-def rakamli_ad(metin, x0, y0, satir, pf, renk, tohum):
-    """Harfleri rakamlarla doldurur; açılışta rakamlar karışık başlayıp yerine oturur."""
-    lh = pf * 1.2
-    bm = rakam_bitmap(metin, satir)
-    rnd = random.Random(tohum)
-    son = [[(str(rnd.randint(0, 9)) if bm.getpixel((x, y)) > 140 else ("." if bm.getpixel((x, y)) > 50 else " "))
-            for x in range(bm.size[0])] for y in range(satir)]
-    p = []
-
-    def katman(izgara, sinif, stil=""):
-        out = [f'<g class="{sinif}" fill="{renk}"{stil}>']
-        for y, sat in enumerate(izgara):
-            s = "".join(sat).rstrip()
-            if s.strip():
-                out.append(f'<text x="{x0}" y="{y0 + (y + 1) * lh:.1f}" xml:space="preserve">{e(s)}</text>')
-        out.append("</g>")
-        return out
-
-    karesayisi = 6
-    for k in range(karesayisi):  # karışık kareler: her karede biraz daha fazla hücre yerine oturur
-        oran = k / karesayisi
-        iz = []
-        for y, sat in enumerate(son):
-            iz.append([ch if (ch != " " and rnd.random() < oran) else
-                       (str(rnd.randint(0, 9)) if (ch != " " or rnd.random() < 0.10 * (1 - oran)) else " ")
-                       for ch in sat])
-        p += katman(iz, "coz", f' style="animation-delay:{0.25 + k * 0.11:.2f}s"')
-    p += katman(son, "otur", f' style="animation-delay:{0.25 + karesayisi * 0.11:.2f}s"')
-    return "\n".join(p), bm.size[0] * pf * 0.6, satir * lh
-
-
-# ================================================================ kapak
 
 def hero():
     W, H = 960, 400
-    sut, sat, pf = 80, 40, 7.6
+    pf = 7.6
     lh = pf * 1.2
-    pw, ph = sut * pf * 0.6, sat * lh
-    px, py = W - pw - 20, (H - ph) / 2
-    govde, css = portre(px, py, sut, sat, pf, lh)
-
-    x, ust = 52, 96
-    ad1, w1, h1 = rakamli_ad("ESPHI", x, ust, 22, 4.2, TURUNCU, 1)
-    ad2 = ""
-    alt = ust + h1
+    sut, sat = round(W / (pf * 0.6)), round(H / lh)
+    tablo = genis_tablo(sut * 10, round(sat * 20))  # hücre oranı 1:2
+    govde, css = portre(0, (H - sat * lh) / 2, sut, sat, pf, lh, kaynak=tablo)
 
     p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
-         f'role="img" aria-label="esphi — turning ideas into real products. Big Data Analytics, SUBÜ.">']
+         f'role="img" aria-label="ASCII portrait. Turning ideas into real products. Big Data Analytics, SUBÜ.">']
     p.append(f"""<style>{css}
-.coz{{opacity:0;animation:an .11s steps(1) 1}}
-.otur{{animation:kal .01s linear backwards}}
 .imlec{{animation:yanip 1.1s steps(1) infinite}}
-@keyframes an{{0%,100%{{opacity:1}}}}
-@keyframes kal{{from{{opacity:0}}to{{opacity:0}}}}
 @keyframes yanip{{50%{{opacity:0}}}}
-@media (prefers-reduced-motion:reduce){{*{{animation:none!important}}}}
+{AZ_HAREKET}
 </style>""")
     p.append(f"""<defs>
 <clipPath id="c"><rect width="{W}" height="{H}" rx="16"/></clipPath>
-<linearGradient id="solgecis" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".2" stop-color="#fff"/></linearGradient>
-<mask id="m1"><rect x="{px}" y="0" width="{pw}" height="{H}" fill="url(#solgecis)"/></mask>
+<linearGradient id="golge" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="{ZEMIN}" stop-opacity="0"/><stop offset=".55" stop-color="{ZEMIN}" stop-opacity=".88"/></linearGradient>
+<linearGradient id="yatay" x1="0" x2="1"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<mask id="golgemaske"><rect x="0" y="{H - 150}" width="600" height="150" fill="url(#yatay)"/></mask>
 </defs>""")
-    p.append(f'<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{ZEMIN}"/>')
-    p.append(f'<g mask="url(#m1)">{govde}</g>')
-    p.append(f'<g font-family="{MONO}" font-size="4.2px" font-weight="700">{ad1}{ad2}</g>')
-    y = alt + 52
+    p.append(f'<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{ZEMIN}"/>{govde}')
+    p.append(f'<rect x="0" y="{H - 150}" width="600" height="150" fill="url(#golge)" mask="url(#golgemaske)"/>')
+    x, y = 34, H - 54
     p.append(f'<text x="{x}" y="{y}" font-family="{MONO}" font-size="19" fill="{YAZI}" xml:space="preserve">'
              f'<tspan fill="{TURUNCU}">&gt;</tspan> turning ideas into <tspan fill="{TURUNCU}">real products</tspan>'
              f'<tspan class="imlec" fill="{TURUNCU}"> █</tspan></text>')
-    p.append(f'<text x="{x}" y="{y + 32}" font-family="{MONO}" font-size="13.5" fill="{SOLUK}" xml:space="preserve">'
+    p.append(f'<text x="{x}" y="{y + 28}" font-family="{MONO}" font-size="13.5" fill="{SOLUK}" xml:space="preserve">'
              f'big data analytics @ SUBÜ  ·  data tools, apps, games</text>')
     p.append(f'</g><rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="16" fill="none" stroke="{KENAR}"/>')
     p.append("</svg>")
