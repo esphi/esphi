@@ -202,10 +202,6 @@ PIPELINE = [
     ("BİİİP", "rap lyric game", 1, True),
     None,
     ("ZIP RUSH", "mobile puzzle", 1, False),
-    ("Olta Diyarı", "pixel-art fishing", 1, False),
-    ("Fossil Fusion", "roblox game", 1, False),
-    ("Web Arena", "browser fps", 1, False),
-    ("İHA Pilotu", "flight sim", 1, False),
 ]
 
 
