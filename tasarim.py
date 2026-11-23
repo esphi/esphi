@@ -178,17 +178,17 @@ def rakamli_ad(metin, x0, y0, satir, pf, renk, tohum):
 # ================================================================ kapak
 
 def hero():
-    W, H = 960, 440
-    sut, sat, pf = 80, 42, 7.6
+    W, H = 960, 400
+    sut, sat, pf = 80, 40, 7.6
     lh = pf * 1.2
     pw, ph = sut * pf * 0.6, sat * lh
     px, py = W - pw - 20, (H - ph) / 2
     govde, css = portre(px, py, sut, sat, pf, lh)
 
-    x = 52
-    ad1, w1, h1 = rakamli_ad("EMRE", x, 56, 21, 5.4, TURUNCU, 1)
-    ad2, w2, h2 = rakamli_ad("YILDIRIM", x, 56 + h1 + 12, 21, 5.4, YAZI, 2)
-    alt = 56 + h1 + 12 + h2
+    x, ust = 52, 74
+    ad1, w1, h1 = rakamli_ad("EMRE", x, ust, 17, 4.2, TURUNCU, 1)
+    ad2, w2, h2 = rakamli_ad("YILDIRIM", x, ust + h1 + 8, 17, 4.2, YAZI, 2)
+    alt = ust + h1 + 8 + h2
 
     p = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
          f'role="img" aria-label="Emre Yıldırım — turning ideas into real products. Big Data Analytics, SUBÜ.">']
@@ -208,8 +208,8 @@ def hero():
 </defs>""")
     p.append(f'<g clip-path="url(#c)"><rect width="{W}" height="{H}" fill="{ZEMIN}"/>')
     p.append(f'<g mask="url(#m1)">{govde}</g>')
-    p.append(f'<g font-family="{MONO}" font-size="5.4px" font-weight="700">{ad1}{ad2}</g>')
-    y = alt + 46
+    p.append(f'<g font-family="{MONO}" font-size="4.2px" font-weight="700">{ad1}{ad2}</g>')
+    y = alt + 52
     p.append(f'<text x="{x}" y="{y}" font-family="{MONO}" font-size="19" fill="{YAZI}" xml:space="preserve">'
              f'<tspan fill="{TURUNCU}">&gt;</tspan> turning ideas into <tspan fill="{TURUNCU}">real products</tspan>'
              f'<tspan class="imlec" fill="{TURUNCU}"> █</tspan></text>')
