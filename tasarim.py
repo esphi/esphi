@@ -285,8 +285,7 @@ def imza():
 
 
 if __name__ == "__main__":
-    for eski in VARLIK.glob("*.svg"):
-        eski.unlink()  # hepsi bu betikten üretiliyor
+    # us.svg ayrı üretilir: node hat/us.mjs (PIPELINE değişirse oradaki PROJE listesini de güncelle)
     (VARLIK / "hero.svg").write_text(hero(), encoding="utf-8")
     (VARLIK / "pipeline.svg").write_text(pipeline(), encoding="utf-8")
     (VARLIK / "imza.svg").write_text(imza(), encoding="utf-8")
